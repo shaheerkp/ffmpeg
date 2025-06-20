@@ -1,28 +1,28 @@
 const express = require('express');
-const { exec } = require('child_process');
 const { createClip } = require('./service/ffmepg');
-const { downloadFromS3, uploadVideoToS3 } = require('./service/aws');
+const { downloadFromS3, uploadVideoToS3, ensureTmpDirExists } = require('./service/aws');
 const app = express();
-const port = 3000;
+const port = 3001;
 
 app.use(express.json());
 
 app.get('/generatevideo', async (req, res) => {
-  const name = req.query.name
+  const name = req.query.name;
+  if (!name) return res.status(400).json({ error: "Missing name parameter" });
+
   try {
-    // For demo: assume file already exists at inputPath
-    console.log("started video generation")
-    await downloadFromS3(name)
-    await createClip(name)
-    const url = await uploadVideoToS3(name)
-    res.status(200).json(url)
-
+    console.log("started video generation");
+    ensureTmpDirExists();
+    await downloadFromS3(name);
+    await createClip(name);  // make sure this doesn't throw
+    const url = await uploadVideoToS3(name);
+    res.status(200).json({ url });
   } catch (error) {
-    throw new Error("failed generating video")
+    console.error(error);
+    res.status(500).json({ error: "Failed generating video" });
   }
-
 });
 
 app.listen(port, () => {
   console.log(`FFmpeg server listening on port ${port}`);
-});
+})

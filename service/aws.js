@@ -25,11 +25,12 @@ async function downloadFromS3(name) {
         const arr = [0, 1, 2, 3, 4]
     
         for (const [ele, index] of arr.entries()) {
-            const localPath = path.join(__dirname, `../tmp/${name}-${index}.jpg`)
-            const command = new GetObjectCommand({
-                Bucket: BUCKET,
-                Key: `${name}/${name}-${index}.jpg`,
-            });
+          const localPath = path.join(__dirname, `../tmp/${name}-${index}.jpg`)
+          const command = new GetObjectCommand({
+            Bucket: BUCKET,
+            Key: `${name}/${name}-${index}.jpg`,
+          });
+          console.log("----",`${name}/${name}-${index}.jpg`)
             const response = await s3.send(command);
             await streamPipeline(response.Body, fs.createWriteStream(localPath));
             console.log(`Downloaded `);
@@ -86,4 +87,23 @@ async function uploadVideoToS3(name) {
 
 
 
-module.exports = { downloadFromS3,uploadVideoToS3 };
+function ensureTmpDirExists() {
+  const tmpPath = path.resolve(__dirname, '../tmp');
+  if (!fs.existsSync(tmpPath)) {
+    fs.mkdirSync(tmpPath, { recursive: true });
+  }
+}
+
+
+function cleanTmpFiles(name) {
+  const dirPath = path.resolve(__dirname, '../tmp');
+  if (!fs.existsSync(dirPath)) return;
+  const files = fs.readdirSync(dirPath);
+  for (const file of files) {
+    if (file.startsWith(name)) {
+      fs.unlinkSync(path.join(dirPath, file));
+    }
+  }
+}
+
+module.exports = { downloadFromS3,uploadVideoToS3,ensureTmpDirExists,cleanTmpFiles };
