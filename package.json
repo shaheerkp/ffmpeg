@@ -13,6 +13,7 @@
     "@aws-sdk/lib-storage": "^3.832.0",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
-    "fluent-ffmpeg": "^2.1.3"
+    "fluent-ffmpeg": "^2.1.3",
+    "p-map": "^7.0.3"
   }
 }
