@@ -3,7 +3,7 @@ const path = require("path");
 const ffmpeg = require("fluent-ffmpeg");
 let pMap;
 (async () => {
-  pMap = (await import("p-map")).default;
+    pMap = (await import("p-map")).default;
 })();
 
 const tempDir = path.resolve("tmp");
@@ -13,10 +13,10 @@ if (!fs.existsSync(tempDir)) {
     fs.mkdirSync(tempDir, { recursive: true });
 }
 
-const VIDEO_RESOLUTION = "640:360";
+const VIDEO_RESOLUTION = "720:1280";
 const FRAME_RATE = 30;
-const IMAGE_DURATION = 3;
-const CONCURRENCY_LIMIT = 4; // Adjust for your CPU
+const IMAGE_DURATION = 5;
+const CONCURRENCY_LIMIT = 2; // Adjust for your CPU
 
 async function createClip(name) {
     console.time("Total");
@@ -56,7 +56,8 @@ function createImageVideo(imagePath, outputPath, duration) {
             .loop(duration)
             .outputOptions([
                 `-t ${duration}`,
-                `-vf scale=${VIDEO_RESOLUTION},format=yuv420p`,
+                `-vf scale='iw*min(720/iw\\,1280/ih)':'ih*min(720/iw\\,1280/ih)',pad=720:1280:(720-iw*min(720/iw\\,1280/ih))/2:(1280-ih*min(720/iw\\,1280/ih))/2,format=yuv420p`,
+                `-r ${FRAME_RATE}`,
                 `-r ${FRAME_RATE}`,
                 "-preset ultrafast",
                 "-c:v libx264",
