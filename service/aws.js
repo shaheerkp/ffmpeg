@@ -19,32 +19,38 @@ const streamPipeline = promisify(pipeline);
 const BUCKET="sports-reel-dev"
 
 async function downloadFromS3(name) {
-    console.log("inside downloadFroms3")
-    const arr = [0, 1, 2, 3, 4]
 
-    for (const [ele, index] of arr.entries()) {
-        const localPath = path.join(__dirname, `../tmp/${name}-${index}.jpg`)
+    try {
+        console.log("inside downloadFroms3")
+        const arr = [0, 1, 2, 3, 4]
+    
+        for (const [ele, index] of arr.entries()) {
+            const localPath = path.join(__dirname, `../tmp/${name}-${index}.jpg`)
+            const command = new GetObjectCommand({
+                Bucket: BUCKET,
+                Key: `${name}/${name}-${index}.jpg`,
+            });
+            const response = await s3.send(command);
+            await streamPipeline(response.Body, fs.createWriteStream(localPath));
+            console.log(`Downloaded `);
+        }
+    
+        console.log("generating video")
+    
         const command = new GetObjectCommand({
             Bucket: BUCKET,
-            Key: `${name}/${name}-${index}.jpg`,
+            Key: `${name}/audio.mp3`,
         });
+    
+        const audioPath = path.join(__dirname, `../tmp/${name}.mp3`)
+    
         const response = await s3.send(command);
-        await streamPipeline(response.Body, fs.createWriteStream(localPath));
-        console.log(`Downloaded `);
+        await streamPipeline(response.Body, fs.createWriteStream(audioPath));
+        console.log(`audio downloaded `);
+        
+    } catch (error) {
+        console.log(error,"errr")
     }
-
-    console.log("generating video")
-
-    const command = new GetObjectCommand({
-        Bucket: BUCKET,
-        Key: `${name}/audio.mp3`,
-    });
-
-    const audioPath = path.join(__dirname, `../tmp/${name}.mp3`)
-
-    const response = await s3.send(command);
-    await streamPipeline(response.Body, fs.createWriteStream(audioPath));
-    console.log(`audio downloaded `);
 
 }
 
