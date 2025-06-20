@@ -15,7 +15,7 @@ if (!fs.existsSync(tempDir)) {
 
 const VIDEO_RESOLUTION = "720:1280";
 const FRAME_RATE = 30;
-const IMAGE_DURATION = 5;
+const IMAGE_DURATION = 3;
 const CONCURRENCY_LIMIT = 2; // Adjust for your CPU
 
 async function createClip(name) {
