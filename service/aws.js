@@ -19,6 +19,7 @@ const streamPipeline = promisify(pipeline);
 const BUCKET="sports-reel-dev"
 
 async function downloadFromS3(name) {
+    console.log("inside downloadFroms3")
     const arr = [0, 1, 2, 3, 4]
 
     for (const [ele, index] of arr.entries()) {
@@ -31,6 +32,8 @@ async function downloadFromS3(name) {
         await streamPipeline(response.Body, fs.createWriteStream(localPath));
         console.log(`Downloaded `);
     }
+
+    console.log("generating video")
 
     const command = new GetObjectCommand({
         Bucket: BUCKET,

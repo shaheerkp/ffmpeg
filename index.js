@@ -11,6 +11,7 @@ app.get('/generatevideo', async (req, res) => {
   const name = req.query.name
   try {
     // For demo: assume file already exists at inputPath
+    console.log("started video generation")
     await downloadFromS3(name)
     await createClip(name)
     const url = await uploadVideoToS3(name)
