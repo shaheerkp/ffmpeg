@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const ffmpeg = require("fluent-ffmpeg");
+const os=require("os")
 let pMap;
 (async () => {
     pMap = (await import("p-map")).default;
@@ -16,7 +17,9 @@ if (!fs.existsSync(tempDir)) {
 const VIDEO_RESOLUTION = "720:1280";
 const FRAME_RATE = 30;
 const IMAGE_DURATION = 3;
-const CONCURRENCY_LIMIT = 2; // Adjust for your CPU
+const CONCURRENCY_LIMIT = os.cpus().length - 1;
+
+console.log(CONCURRENCY_LIMIT,"CONCURRENCY_LIMIT")
 
 async function createClip(name) {
     console.time("Total");
